@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.foryou.ui.screen.MainPage
+import com.example.foryou.ui.screens.MainPage
 import com.example.foryou.ui.screens.*
 import com.example.foryou.viewmodel.AuthViewModel
 

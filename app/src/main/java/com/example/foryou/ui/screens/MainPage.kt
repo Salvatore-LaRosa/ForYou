@@ -1,4 +1,4 @@
-package com.example.foryou.ui.screen
+package com.example.foryou.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
