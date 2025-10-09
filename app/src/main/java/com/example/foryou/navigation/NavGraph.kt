@@ -8,12 +8,32 @@ import androidx.navigation.compose.composable
 import com.example.foryou.ui.screens.MainPage
 import com.example.foryou.ui.screens.*
 import com.example.foryou.viewmodel.AuthViewModel
+import com.example.foryou.viewmodel.MedicineViewModel
 
 @Composable
-fun NavGraph(navController: NavHostController, viewModel: AuthViewModel, modifier: Modifier = Modifier) {
+fun NavGraph(
+    navController: NavHostController,
+    viewModel: AuthViewModel,
+    medicineViewModel: MedicineViewModel,
+    modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "login", modifier = modifier) {
         composable("login") { LoginScreen(navController, viewModel) }
         composable("register") { RegisterScreen(navController, viewModel) }
-        composable("mainPage") { MainPage() }
+        composable("mainPage/{userEmail}") { backStackEntry ->
+            val userEmail = backStackEntry.arguments?.getString("userEmail") ?: ""
+            MainPage(
+                navController = navController,
+                medicineViewModel = medicineViewModel,
+                userEmail = userEmail
+            )
+        }
+        composable("add_medicine/{userEmail}") { backStackEntry ->
+            val userEmail = backStackEntry.arguments?.getString("userEmail") ?: ""
+            AddMedicinePage(
+                navController = navController,
+                medicineViewModel = medicineViewModel,
+                userEmail = userEmail
+            )
+        }
     }
 }

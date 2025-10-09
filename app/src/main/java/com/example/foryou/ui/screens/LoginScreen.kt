@@ -3,6 +3,7 @@ package com.example.foryou.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -50,14 +51,22 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Text("Login")
         }
 
-        TextButton(onClick = { navController.navigate("register") }) {
+        Spacer(Modifier.height(8.dp))
+
+        TextButton(
+            onClick = { navController.navigate("register") },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
             Text("Non hai un account? Registrati")
         }
 
         authResult?.let {
+            Spacer(Modifier.height(8.dp))
             Text(it)
             if (it == "Login success") {
-                navController.navigate("mainPage")
+                navController.navigate("mainPage/${email}") {
+                    popUpTo("login") { inclusive = true }
+                }
                 viewModel.clearMessage()
             }
         }
