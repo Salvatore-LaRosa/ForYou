@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.foryou.data.Medicine
 import com.example.foryou.viewmodel.MedicineViewModel
 import java.time.LocalDate
 
