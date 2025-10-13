@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.Flow
 class MedicineRepository(private val dao: MedicineDao) {
     suspend fun insertMedicine(medicine: Medicine) = dao.insertMedicine(medicine)
 
-    fun getMedicinesForUserAndDate(email: String, today: String): Flow<List<Medicine>> =
+    fun getAllMedicinesForUser(email: String): Flow<List<Medicine>> =
+        dao.getAllMedicinesForUser(email)
+
+    fun getMedicinesForUserAndDate(email: String, today: String) =
         dao.getMedicinesForUserAndDate(email, today)
 }
+

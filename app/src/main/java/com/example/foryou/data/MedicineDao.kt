@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MedicineDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMedicine(medicine: Medicine)
 
     @Query("SELECT * FROM medicines WHERE userEmail = :email AND endDate >= :today")
     fun getMedicinesForUserAndDate(email: String, today: String): Flow<List<Medicine>>
+
+    @Query("SELECT * FROM medicines WHERE userEmail = :email")
+    fun getAllMedicinesForUser(email: String): Flow<List<Medicine>>
 }
