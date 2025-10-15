@@ -14,14 +14,14 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.foryou.data.UserDatabase
-import com.example.foryou.repository.UserRepository
+import com.example.foryou.navigation.NavGraph
 import com.example.foryou.repository.MedicineRepository
+import com.example.foryou.repository.UserRepository
+import com.example.foryou.ui.theme.ForYouTheme
 import com.example.foryou.viewmodel.AuthViewModel
 import com.example.foryou.viewmodel.AuthViewModelFactory
 import com.example.foryou.viewmodel.MedicineViewModel
 import com.example.foryou.viewmodel.MedicineViewModelFactory
-import com.example.foryou.navigation.NavGraph
-import com.example.foryou.ui.theme.ForYouTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -32,6 +32,10 @@ class MainActivity : ComponentActivity() {
         // Crea il canale di notifica
         createNotificationChannel()
         requestNotificationPermission()
+
+        // Controlla se l'app è stata aperta da una notifica
+        val openDetails = intent?.getBooleanExtra("openDetails", false) ?: false
+        val medicineName = intent?.getStringExtra("medicineName")
 
         val database = UserDatabase.getDatabase(this)
         val userRepository = UserRepository(database.userDao())
@@ -49,7 +53,12 @@ class MainActivity : ComponentActivity() {
                 NavGraph(
                     navController = navController,
                     viewModel = authViewModel,
-                    medicineViewModel = medicineViewModel
+                    medicineViewModel = medicineViewModel,
+                    modifier = if (openDetails && medicineName != null) {
+                        androidx.compose.ui.Modifier
+                    } else {
+                        androidx.compose.ui.Modifier
+                    }
                 )
             }
         }

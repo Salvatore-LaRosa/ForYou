@@ -17,6 +17,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.rememberDatePickerState
 import java.time.Instant
 import java.time.ZoneId
+import com.example.foryou.data.Medicine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,6 +28,8 @@ fun MainPage(
 ) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var showDatePicker by remember { mutableStateOf(false) }
+
+    var selectedMedicine by remember { mutableStateOf<Medicine?>(null) }
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val medicines by medicineViewModel.getAllMedicinesForUser(userEmail)
@@ -103,6 +106,9 @@ fun MainPage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
+                                .clickable {
+                                    selectedMedicine = med //apre il dettaglio
+                                }
                         ) {
                             Column(modifier = Modifier.padding(8.dp)) {
                                 Text(med.name, style = MaterialTheme.typography.titleMedium)
@@ -139,6 +145,27 @@ fun MainPage(
             },
             text = {
                 DatePicker(state = datePickerState)
+            }
+        )
+    }
+
+    // --- Dialog Dettaglio Farmaco ---
+    if (selectedMedicine != null) {
+        AlertDialog(
+            onDismissRequest = { selectedMedicine = null },
+            confirmButton = {
+                TextButton(onClick = { selectedMedicine = null }) {
+                    Text("Chiudi")
+                }
+            },
+            title = { Text(selectedMedicine!!.name) },
+            text = {
+                Column {
+                    Text("Quantità: ${selectedMedicine!!.quantity}")
+                    Text("Frequenza: ${selectedMedicine!!.frequency}")
+                    Text("Data fine: ${selectedMedicine!!.endDate}")
+                    Text("Note: ${selectedMedicine!!.notes ?: "Nessuna"}")
+                }
             }
         )
     }
