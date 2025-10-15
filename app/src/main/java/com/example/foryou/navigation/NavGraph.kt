@@ -10,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.foryou.ui.screens.LoginScreen
 import com.example.foryou.ui.screens.RegisterScreen
-import com.example.foryou.ui.screens.AddMedicinePage
 import com.example.foryou.viewmodel.AuthViewModel
 import com.example.foryou.viewmodel.MedicineViewModel
 
@@ -38,14 +37,6 @@ fun NavGraph(
                     modifier = Modifier.padding(innerPadding)
                 )
             }
-        }
-        composable("add_medicine/{userEmail}") { backStackEntry ->
-            val userEmail = backStackEntry.arguments?.getString("userEmail") ?: ""
-            AddMedicinePage(
-                navController = navController,
-                medicineViewModel = medicineViewModel,
-                userEmail = userEmail
-            )
         }
     }
 }

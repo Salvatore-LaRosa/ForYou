@@ -32,5 +32,13 @@ fun BottomNavGraph(
         composable(BottomNavItem.Settings.route) {
             SettingsPage()
         }
+        composable("add_medicine/{userEmail}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("userEmail") ?: userEmail
+            AddMedicinePage(
+                navController = navController,
+                medicineViewModel = medicineViewModel,
+                userEmail = email
+            )
+        }
     }
 }
