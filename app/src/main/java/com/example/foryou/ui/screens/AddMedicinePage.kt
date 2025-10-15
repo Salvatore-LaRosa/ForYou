@@ -1,25 +1,28 @@
 package com.example.foryou.ui.screens
 
+import android.Manifest
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import com.example.foryou.data.Medicine
+import com.example.foryou.notification.ReminderReceiver
 import com.example.foryou.viewmodel.MedicineViewModel
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.ZoneId
+import java.time.*
 import java.time.format.DateTimeFormatter
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +31,8 @@ fun AddMedicinePage(
     medicineViewModel: MedicineViewModel,
     userEmail: String
 ) {
+    val context = LocalContext.current
+
     var name by remember { mutableStateOf("") }
     var frequency by remember { mutableStateOf("Ogni giorno") }
     var quantity by remember { mutableStateOf("") }
@@ -141,6 +146,15 @@ fun AddMedicinePage(
                         creationDate = LocalDate.now().toString()
                     )
                     medicineViewModel.insertMedicine(medicine)
+
+                    // --- Pianifica la notifica ---
+                    scheduleMedicineReminder(
+                        context = context,
+                        medicineName = name,
+                        time = time!!,
+                        frequency = frequency
+                    )
+
                     navController.popBackStack()
                 }
             }) {
@@ -196,4 +210,57 @@ fun AddMedicinePage(
             }
         )
     }
+
+    // --- Richiesta permesso notifiche per Android 13+ ---
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                (context as android.app.Activity),
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                1
+            )
+        }
+    }
+}
+
+// Funzione per pianificare la notifica
+fun scheduleMedicineReminder(
+    context: Context,
+    medicineName: String,
+    time: LocalTime,
+    frequency: String
+) {
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis()
+        set(Calendar.HOUR_OF_DAY, time.hour)
+        set(Calendar.MINUTE, time.minute)
+        set(Calendar.SECOND, 0)
+    }
+
+    val intent = Intent(context, ReminderReceiver::class.java).apply {
+        putExtra("medicineName", medicineName)
+    }
+
+    val pendingIntent = PendingIntent.getBroadcast(
+        context,
+        medicineName.hashCode(), // ID univoco per farmaco
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    val interval = when (frequency) {
+        "Ogni giorno" -> AlarmManager.INTERVAL_DAY
+        "Ogni settimana" -> AlarmManager.INTERVAL_DAY * 7
+        "Ogni mese" -> AlarmManager.INTERVAL_DAY * 30
+        else -> AlarmManager.INTERVAL_DAY
+    }
+
+    alarmManager.setRepeating(
+        AlarmManager.RTC_WAKEUP,
+        calendar.timeInMillis,
+        interval,
+        pendingIntent
+    )
 }
