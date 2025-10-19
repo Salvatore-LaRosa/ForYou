@@ -3,6 +3,7 @@ package com.example.foryou.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foryou.data.Medicine
+import com.example.foryou.data.MedicineIntake
 import com.example.foryou.repository.MedicineRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -21,8 +22,20 @@ class MedicineViewModel(private val repository: MedicineRepository) : ViewModel(
         return repository.getAllMedicinesForUser(email)
     }
 
-    // Restituisce i farmaci filtrati per oggi (o qualsiasi data se vuoi usarla)
-    fun getMedicinesForUserAndDate(email: String, today: String): Flow<List<Medicine>> {
-        return repository.getMedicinesForUserAndDate(email, today)
+    fun markAsTaken(medicineName: String, userEmail: String, date: String) {
+        viewModelScope.launch {
+            repository.insertIntake(
+                MedicineIntake(
+                    medicineName = medicineName,
+                    userEmail = userEmail,
+                    date = date,
+                    taken = true
+                )
+            )
+        }
+    }
+
+    fun getIntakesForMedicine(email: String, medicineName: String): Flow<List<MedicineIntake>> {
+        return repository.getIntakesForMedicine(email, medicineName)
     }
 }

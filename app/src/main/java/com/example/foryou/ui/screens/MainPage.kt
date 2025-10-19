@@ -28,7 +28,6 @@ fun MainPage(
 ) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var showDatePicker by remember { mutableStateOf(false) }
-
     var selectedMedicine by remember { mutableStateOf<Medicine?>(null) }
 
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -44,8 +43,7 @@ fun MainPage(
         for (format in formats) {
             try {
                 return LocalDate.parse(dateStr, format)
-            } catch (_: DateTimeParseException) {
-            }
+            } catch (_: DateTimeParseException) {}
         }
         return null
     }
@@ -55,9 +53,7 @@ fun MainPage(
         val end = parseDate(med.endDate)
         if (start != null && end != null) {
             selectedDate in start..end
-        } else {
-            false
-        }
+        } else false
     }
 
     Scaffold(
@@ -102,22 +98,49 @@ fun MainPage(
             } else {
                 LazyColumn {
                     items(filteredMedicines) { med ->
+                        // Recupera gli intakes per questo farmaco
+                        val intakes by medicineViewModel
+                            .getIntakesForMedicine(userEmail, med.name)
+                            .collectAsState(initial = emptyList())
+
+                        val today = selectedDate.toString()
+                        val isTakenToday = intakes.any { it.date == today && it.taken }
+
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp)
-                                .clickable {
-                                    selectedMedicine = med //apre il dettaglio
-                                }
+                                .clickable { selectedMedicine = med },
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (isTakenToday)
+                                    MaterialTheme.colorScheme.tertiaryContainer // Verde chiaro
+                                else
+                                    MaterialTheme.colorScheme.surfaceVariant
+                            )
                         ) {
                             Column(modifier = Modifier.padding(8.dp)) {
-                                Text(med.name, style = MaterialTheme.typography.titleMedium)
+                                Text(
+                                    med.name,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = if (isTakenToday)
+                                        MaterialTheme.colorScheme.onTertiaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.onSurface
+                                )
                                 Text("Quantità: ${med.quantity}")
                                 Text("Note: ${med.notes ?: "—"}")
+                                if (isTakenToday) {
+                                    Text(
+                                        "Assunto oggi",
+                                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
             }
         }
     }
@@ -143,9 +166,7 @@ fun MainPage(
                     Text("Annulla")
                 }
             },
-            text = {
-                DatePicker(state = datePickerState)
-            }
+            text = { DatePicker(state = datePickerState) }
         )
     }
 
@@ -153,11 +174,6 @@ fun MainPage(
     if (selectedMedicine != null) {
         AlertDialog(
             onDismissRequest = { selectedMedicine = null },
-            confirmButton = {
-                TextButton(onClick = { selectedMedicine = null }) {
-                    Text("Chiudi")
-                }
-            },
             title = { Text(selectedMedicine!!.name) },
             text = {
                 Column {
@@ -165,8 +181,53 @@ fun MainPage(
                     Text("Frequenza: ${selectedMedicine!!.frequency}")
                     Text("Data fine: ${selectedMedicine!!.endDate}")
                     Text("Note: ${selectedMedicine!!.notes ?: "Nessuna"}")
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        "Seleziona un'azione:",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
-            }
+            },
+            confirmButton = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            val today = selectedDate.toString()
+                            medicineViewModel.markAsTaken(
+                                selectedMedicine!!.name,
+                                userEmail,
+                                today
+                            )
+                            selectedMedicine = null
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Assunta / Completata")
+                    }
+
+                    Button(
+                        onClick = {
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
+                    ) {
+                        Text("Elimina da oggi in poi")
+                    }
+
+                    TextButton(
+                        onClick = { selectedMedicine = null },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Chiudi")
+                    }
+                }
+            },
+            dismissButton = {}
         )
     }
 }
