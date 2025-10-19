@@ -43,4 +43,12 @@ class AuthViewModel(private val repository: UserRepository) : ViewModel() {
     fun clearMessage() {
         _authResult.value = null
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            _email.value = ""
+            _password.value = ""
+            _authResult.value = "Logout success"
+        }
+    }
 }

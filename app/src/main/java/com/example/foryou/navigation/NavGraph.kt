@@ -20,9 +20,17 @@ fun NavGraph(
     medicineViewModel: MedicineViewModel,
     modifier: Modifier = Modifier
 ) {
-    NavHost(navController = navController, startDestination = "login", modifier = modifier) {
-        composable("login") { LoginScreen(navController, viewModel) }
-        composable("register") { RegisterScreen(navController, viewModel) }
+    NavHost(
+        navController = navController,
+        startDestination = "login",
+        modifier = modifier
+    ) {
+        composable("login") {
+            LoginScreen(navController, viewModel)
+        }
+        composable("register") {
+            RegisterScreen(navController, viewModel)
+        }
         composable("mainPage/{userEmail}") { backStackEntry ->
             val userEmail = backStackEntry.arguments?.getString("userEmail") ?: ""
             val bottomNavController = rememberNavController()
@@ -32,6 +40,8 @@ fun NavGraph(
             ) { innerPadding ->
                 BottomNavGraph(
                     navController = bottomNavController,
+                    mainNavController = navController,
+                    authViewModel = viewModel,
                     medicineViewModel = medicineViewModel,
                     userEmail = userEmail,
                     modifier = Modifier.padding(innerPadding)
