@@ -24,7 +24,10 @@ fun BottomNavGraph(
             MainPage(navController, medicineViewModel, userEmail)
         }
         composable(BottomNavItem.Report.route) {
-            ReportPage()
+            ReportPage(
+                medicineViewModel = medicineViewModel,
+                userEmail = userEmail
+            )
         }
         composable(BottomNavItem.Profile.route) {
             ProfilePage()
