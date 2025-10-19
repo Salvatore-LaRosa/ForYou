@@ -22,6 +22,17 @@ class MedicineViewModel(private val repository: MedicineRepository) : ViewModel(
         return repository.getAllMedicinesForUser(email)
     }
 
+    // Restituisce i farmaci filtrati per oggi
+    fun getMedicinesForUserAndDate(email: String, today: String): Flow<List<Medicine>> {
+        return repository.getMedicinesForUserAndDate(email, today)
+    }
+
+    fun deleteFromDate(medicineName: String, userEmail: String, fromDate: String) {
+        viewModelScope.launch {
+            repository.deleteFromDate(medicineName, userEmail, fromDate)
+        }
+    }
+
     fun markAsTaken(medicineName: String, userEmail: String, date: String) {
         viewModelScope.launch {
             repository.insertIntake(

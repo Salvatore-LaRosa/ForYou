@@ -13,6 +13,12 @@ class MedicineRepository(private val dao: MedicineDao) {
     fun getAllMedicinesForUser(email: String): Flow<List<Medicine>> =
         dao.getAllMedicinesForUser(email)
 
+    fun getMedicinesForUserAndDate(email: String, today: String) =
+        dao.getMedicinesForUserAndDate(email, today)
+
+    suspend fun deleteFromDate(medicineName: String, email: String, fromDate: String) =
+        dao.deleteMedicinesFromDate(medicineName, email, fromDate)
+
     fun getIntakesForMedicine(email: String, medicineName: String): Flow<List<MedicineIntake>> =
         dao.getIntakesForMedicine(email, medicineName)
 }

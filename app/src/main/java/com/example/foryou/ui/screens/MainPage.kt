@@ -210,6 +210,13 @@ fun MainPage(
 
                     Button(
                         onClick = {
+                            val today = selectedDate.toString()
+                            medicineViewModel.deleteFromDate(
+                                selectedMedicine!!.name,
+                                userEmail,
+                                today
+                            )
+                            selectedMedicine = null
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(
