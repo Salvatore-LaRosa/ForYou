@@ -64,10 +64,13 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
             Spacer(Modifier.height(8.dp))
             Text(it)
             if (it == "Registration success") {
-                navController.navigate("mainPage/${email}") {
-                    popUpTo("register") { inclusive = true }
+                LaunchedEffect(Unit) {
+                    viewModel.saveUserSession(email) // salva subito la sessione dell’utente
+                    navController.navigate("setup_pin") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                    viewModel.clearMessage()
                 }
-                viewModel.clearMessage()
             }
         }
     }

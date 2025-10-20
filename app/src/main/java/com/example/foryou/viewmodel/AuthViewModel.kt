@@ -73,4 +73,10 @@ class AuthViewModel(
             _authResult.value = "Logout success"
         }
     }
+
+    fun saveUserSession(email: String) {
+        viewModelScope.launch {
+            sessionManager.saveUserEmail(email)
+        }
+    }
 }
