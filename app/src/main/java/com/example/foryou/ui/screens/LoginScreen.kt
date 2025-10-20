@@ -64,10 +64,19 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             Spacer(Modifier.height(8.dp))
             Text(it)
             if (it == "Login success") {
-                navController.navigate("mainPage/${email}") {
-                    popUpTo("login") { inclusive = true }
+                LaunchedEffect(Unit) {
+                    val pinSet = viewModel.isPinSet(email)
+                    if (pinSet) {
+                        navController.navigate("mainPage/${email}") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate("setup_pin") {
+                            popUpTo("login") { inclusive = true }
+                        }
+                    }
+                    viewModel.clearMessage()
                 }
-                viewModel.clearMessage()
             }
         }
     }

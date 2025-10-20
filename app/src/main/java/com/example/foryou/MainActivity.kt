@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.foryou.data.SessionManager
 import com.example.foryou.data.UserDatabase
 import com.example.foryou.navigation.NavGraph
 import com.example.foryou.repository.MedicineRepository
@@ -37,11 +38,16 @@ class MainActivity : ComponentActivity() {
         val openDetails = intent?.getBooleanExtra("openDetails", false) ?: false
         val medicineName = intent?.getStringExtra("medicineName")
 
+        // --- Database e repository ---
         val database = UserDatabase.getDatabase(this)
         val userRepository = UserRepository(database.userDao())
-        val authFactory = AuthViewModelFactory(userRepository)
-
         val medicineRepository = MedicineRepository(database.medicineDao())
+
+        // --- SessionManager per gestire la sessione utente ---
+        val sessionManager = SessionManager(this)
+
+        // --- ViewModel factories ---
+        val authFactory = AuthViewModelFactory(userRepository, sessionManager)
         val medicineFactory = MedicineViewModelFactory(medicineRepository)
 
         setContent {
@@ -54,11 +60,7 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     viewModel = authViewModel,
                     medicineViewModel = medicineViewModel,
-                    modifier = if (openDetails && medicineName != null) {
-                        androidx.compose.ui.Modifier
-                    } else {
-                        androidx.compose.ui.Modifier
-                    }
+                    modifier = androidx.compose.ui.Modifier
                 )
             }
         }
