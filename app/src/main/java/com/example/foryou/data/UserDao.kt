@@ -16,4 +16,10 @@ interface UserDao {
 
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     suspend fun getUserByEmail(email: String): User?
+
+    @Query("UPDATE users SET pinCode = :pin WHERE email = :email")
+    suspend fun updatePin(email: String, pin: String)
+
+    @Query("SELECT pinCode FROM users WHERE email = :email LIMIT 1")
+    suspend fun getPinByEmail(email: String): String?
 }
