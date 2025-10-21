@@ -17,12 +17,14 @@ import com.example.foryou.ui.screens.RegisterScreen
 import com.example.foryou.ui.screens.SetupPinScreen
 import com.example.foryou.viewmodel.AuthViewModel
 import com.example.foryou.viewmodel.MedicineViewModel
+import com.plcoding.biometricauth.BiometricPromptManager
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     viewModel: AuthViewModel,
     medicineViewModel: MedicineViewModel,
+    promptManager: BiometricPromptManager,
     modifier: Modifier = Modifier
 ) {
     val startDestination = remember { mutableStateOf("login") }
@@ -46,7 +48,13 @@ fun NavGraph(
         composable("login") { LoginScreen(navController, viewModel) }
         composable("register") { RegisterScreen(navController, viewModel) }
         composable("setup_pin") { SetupPinScreen(navController, viewModel) }
-        composable("pin_login") { PinLoginScreen(navController, viewModel) }
+        composable("pin_login") {
+            PinLoginScreen(
+                navController = navController,
+                viewModel = viewModel,
+                promptManager = promptManager
+            )
+        }
 
         composable("mainPage/{userEmail}") { backStackEntry ->
             val userEmail = backStackEntry.arguments?.getString("userEmail") ?: ""

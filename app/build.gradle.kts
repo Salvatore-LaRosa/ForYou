@@ -70,6 +70,7 @@ dependencies {
     // --- ROOM (Persistenza locale) ---
     implementation(libs.androidx.room.runtime.android)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.appcompat)
     kapt(libs.androidx.room.compiler)
 
     // --- Test ---
@@ -82,4 +83,6 @@ dependencies {
     // --- Debug ---
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation("androidx.biometric:biometric:1.1.0")
 }
