@@ -3,25 +3,16 @@ package com.example.foryou
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.example.foryou.data.SessionManager
 import com.example.foryou.data.UserDatabase
 import com.example.foryou.navigation.NavGraph
@@ -33,7 +24,6 @@ import com.example.foryou.viewmodel.AuthViewModelFactory
 import com.example.foryou.viewmodel.MedicineViewModel
 import com.example.foryou.viewmodel.MedicineViewModelFactory
 import com.plcoding.biometricauth.BiometricPromptManager
-import com.plcoding.biometricauth.BiometricPromptManager.BiometricResult
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,19 +33,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // --- Notifiche ---
         createNotificationChannel()
         requestNotificationPermission()
 
-        // --- Database e repository ---
+        // Database e repository
         val database = UserDatabase.getDatabase(this)
         val userRepository = UserRepository(database.userDao())
         val medicineRepository = MedicineRepository(database.medicineDao())
 
-        // --- Gestione sessione utente ---
+        // Sessione utente
         val sessionManager = SessionManager(this)
 
-        // --- ViewModel factories ---
+        // ViewModel factories
         val authFactory = AuthViewModelFactory(userRepository, sessionManager)
         val medicineFactory = MedicineViewModelFactory(medicineRepository)
 
@@ -65,38 +54,18 @@ class MainActivity : AppCompatActivity() {
                 val medicineViewModel: MedicineViewModel = viewModel(factory = medicineFactory)
                 val navController = rememberNavController()
 
-                val biometricResult by promptManager.promptResults.collectAsState(initial = null)
-                val enrollLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartActivityForResult(),
-                    onResult = { println("Activity result: $it") }
-                )
-
-                // Se l'utente non ha configurato la biometria → apri impostazioni
-                LaunchedEffect(biometricResult) {
-                    if (biometricResult is BiometricResult.AuthenticationNotSet && Build.VERSION.SDK_INT >= 30) {
-                        val enrollIntent = Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
-                            putExtra(
-                                Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                                BIOMETRIC_STRONG or DEVICE_CREDENTIAL
-                            )
-                        }
-                        enrollLauncher.launch(enrollIntent)
-                    }
-                }
-
-                // --- Navigazione principale dell’app ---
+                // 🔗 Passa promptManager alla NavGraph
                 NavGraph(
                     navController = navController,
                     viewModel = authViewModel,
                     medicineViewModel = medicineViewModel,
-                    promptManager = promptManager, // 👈 Passaggio del manager biometrico
-                    modifier = androidx.compose.ui.Modifier
+                    promptManager = promptManager
                 )
             }
         }
     }
 
-    // --- Notifiche ---
+    // --- Canale notifiche ---
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = "Promemoria Farmaci"
@@ -106,12 +75,13 @@ class MainActivity : AppCompatActivity() {
                 description = descriptionText
             }
 
-            val notificationManager: NotificationManager =
+            val notificationManager =
                 getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
+    // --- Permesso notifiche ---
     private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(

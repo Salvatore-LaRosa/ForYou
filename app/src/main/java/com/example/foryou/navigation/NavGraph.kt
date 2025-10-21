@@ -24,7 +24,7 @@ fun NavGraph(
     navController: NavHostController,
     viewModel: AuthViewModel,
     medicineViewModel: MedicineViewModel,
-    promptManager: BiometricPromptManager,
+    promptManager: BiometricPromptManager, // 👈 aggiunto
     modifier: Modifier = Modifier
 ) {
     val startDestination = remember { mutableStateOf("login") }
@@ -48,13 +48,7 @@ fun NavGraph(
         composable("login") { LoginScreen(navController, viewModel) }
         composable("register") { RegisterScreen(navController, viewModel) }
         composable("setup_pin") { SetupPinScreen(navController, viewModel) }
-        composable("pin_login") {
-            PinLoginScreen(
-                navController = navController,
-                viewModel = viewModel,
-                promptManager = promptManager
-            )
-        }
+        composable("pin_login") { PinLoginScreen(navController, viewModel, promptManager) } // 👈 passaggio del promptManager
 
         composable("mainPage/{userEmail}") { backStackEntry ->
             val userEmail = backStackEntry.arguments?.getString("userEmail") ?: ""
