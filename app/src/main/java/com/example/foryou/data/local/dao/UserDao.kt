@@ -1,9 +1,10 @@
-package com.example.foryou.data
+package com.example.foryou.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.foryou.data.local.entity.User
 
 /**
  * Data Access Object (DAO) for the [User] entity.

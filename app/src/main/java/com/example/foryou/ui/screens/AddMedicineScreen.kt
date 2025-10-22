@@ -18,7 +18,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
-import com.example.foryou.data.Medicine
+import com.example.foryou.data.local.entity.Medicine
 import com.example.foryou.notification.ReminderReceiver
 import com.example.foryou.viewmodel.MedicineViewModel
 import java.time.*

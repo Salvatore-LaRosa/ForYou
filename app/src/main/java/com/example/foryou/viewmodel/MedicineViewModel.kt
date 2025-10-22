@@ -2,8 +2,8 @@ package com.example.foryou.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.foryou.data.Medicine
-import com.example.foryou.data.MedicineIntake
+import com.example.foryou.data.local.entity.Medicine
+import com.example.foryou.data.local.entity.MedicineIntake
 import com.example.foryou.repository.MedicineRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

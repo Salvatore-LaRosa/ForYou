@@ -1,7 +1,7 @@
 package com.example.foryou.repository
 
-import com.example.foryou.data.User
-import com.example.foryou.data.UserDao
+import com.example.foryou.data.local.entity.User
+import com.example.foryou.data.local.dao.UserDao
 
 /**
  * Repository for managing user data.

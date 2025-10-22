@@ -13,8 +13,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.foryou.data.SessionManager
-import com.example.foryou.data.UserDatabase
+import com.example.foryou.data.session.SessionManager
+import com.example.foryou.data.local.UserDatabase
 import com.example.foryou.navigation.NavGraph
 import com.example.foryou.repository.MedicineRepository
 import com.example.foryou.repository.UserRepository

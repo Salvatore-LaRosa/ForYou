@@ -1,9 +1,11 @@
-package com.example.foryou.data
+package com.example.foryou.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.example.foryou.data.local.entity.Medicine
+import com.example.foryou.data.local.entity.MedicineIntake
 import kotlinx.coroutines.flow.Flow
 
 /**

@@ -1,8 +1,8 @@
 package com.example.foryou.repository
 
-import com.example.foryou.data.Medicine
-import com.example.foryou.data.MedicineDao
-import com.example.foryou.data.MedicineIntake
+import com.example.foryou.data.local.entity.Medicine
+import com.example.foryou.data.local.dao.MedicineDao
+import com.example.foryou.data.local.entity.MedicineIntake
 import kotlinx.coroutines.flow.Flow
 
 /**

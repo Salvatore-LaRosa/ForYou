@@ -17,7 +17,7 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.rememberDatePickerState
 import java.time.Instant
 import java.time.ZoneId
-import com.example.foryou.data.Medicine
+import com.example.foryou.data.local.entity.Medicine
 
 /**
  * Utility function to parse a string into a LocalDate object.

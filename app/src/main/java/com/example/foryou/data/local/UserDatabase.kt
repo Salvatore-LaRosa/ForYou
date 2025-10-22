@@ -1,9 +1,14 @@
-package com.example.foryou.data
+package com.example.foryou.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.foryou.data.local.dao.MedicineDao
+import com.example.foryou.data.local.dao.UserDao
+import com.example.foryou.data.local.entity.Medicine
+import com.example.foryou.data.local.entity.MedicineIntake
+import com.example.foryou.data.local.entity.User
 
 /**
  * The main database for the application.

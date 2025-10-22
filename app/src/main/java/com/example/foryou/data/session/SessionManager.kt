@@ -1,4 +1,4 @@
-package com.example.foryou.data
+package com.example.foryou.data.session
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -2,7 +2,7 @@ package com.example.foryou.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.foryou.data.SessionManager
+import com.example.foryou.data.session.SessionManager
 import com.example.foryou.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
