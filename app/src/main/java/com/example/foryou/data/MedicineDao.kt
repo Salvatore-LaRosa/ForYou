@@ -32,17 +32,6 @@ interface MedicineDao {
     suspend fun insertIntake(intake: MedicineIntake)
 
     /**
-     * Retrieves all active medicines for a specific user, filtered by date.
-     * Only medicines with an end date on or after the given date are returned.
-     *
-     * @param email The user's email.
-     * @param today The current date (in "yyyy-MM-dd" format) to filter by.
-     * @return A [Flow] emitting a list of active [Medicine] objects.
-     */
-    @Query("SELECT * FROM medicines WHERE userEmail = :email AND endDate >= :today")
-    fun getMedicinesForUserAndDate(email: String, today: String): Flow<List<Medicine>>
-
-    /**
      * Retrieves all medicines ever registered for a specific user.
      *
      * @param email The user's email.
