@@ -1,4 +1,4 @@
-package com.plcoding.biometricauth
+package com.example.foryou.util
 
 import android.os.Build
 import androidx.fragment.app.FragmentActivity
