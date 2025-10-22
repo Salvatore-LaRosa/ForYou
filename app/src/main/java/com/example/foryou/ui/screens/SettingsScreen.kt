@@ -10,7 +10,7 @@ import androidx.navigation.NavController
 import com.example.foryou.viewmodel.AuthViewModel
 
 @Composable
-fun SettingsPage(
+fun SettingsScreen(
     navController: NavController,
     authViewModel: AuthViewModel
 ) {
@@ -31,9 +31,7 @@ fun SettingsPage(
 
             Button(
                 onClick = {
-                    // Logout dell'utente
                     authViewModel.logout()
-                    // Torna alla schermata di login
                     navController.navigate("login") {
                         popUpTo(0) // Rimuove tutto lo stack di navigazione
                     }
