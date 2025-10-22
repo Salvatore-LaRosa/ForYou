@@ -17,14 +17,14 @@ import com.example.foryou.ui.screens.RegisterScreen
 import com.example.foryou.ui.screens.SetupPinScreen
 import com.example.foryou.viewmodel.AuthViewModel
 import com.example.foryou.viewmodel.MedicineViewModel
-import com.plcoding.biometricauth.BiometricPromptManager
+import com.example.foryou.util.BiometricPromptManager
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     viewModel: AuthViewModel,
     medicineViewModel: MedicineViewModel,
-    promptManager: BiometricPromptManager, // 👈 aggiunto
+    promptManager: BiometricPromptManager,
     modifier: Modifier = Modifier
 ) {
     val startDestination = remember { mutableStateOf("login") }

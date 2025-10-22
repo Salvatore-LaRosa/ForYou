@@ -10,6 +10,5 @@ sealed class BottomNavItem(
 ) {
     object Home : BottomNavItem("main", "Home", R.drawable.ic_home)
     object Report : BottomNavItem("report", "Resoconto", R.drawable.ic_report)
-    object Profile : BottomNavItem("profile", "Profilo", R.drawable.ic_profile)
     object Settings : BottomNavItem("settings", "Impostazioni", R.drawable.ic_settings)
 }

@@ -16,7 +16,7 @@ fun BottomNavGraph(
     medicineViewModel: MedicineViewModel,
     userEmail: String,
     modifier: Modifier = Modifier,
-    mainNavController: NavHostController // 👈 nuovo parametro
+    mainNavController: NavHostController
 ) {
     NavHost(
         navController = navController,
@@ -24,20 +24,17 @@ fun BottomNavGraph(
         modifier = modifier
     ) {
         composable(BottomNavItem.Home.route) {
-            MainPage(navController, medicineViewModel, userEmail)
+            HomeScreen(navController, medicineViewModel, userEmail)
         }
         composable(BottomNavItem.Report.route) {
-            ReportPage(medicineViewModel, userEmail)
-        }
-        composable(BottomNavItem.Profile.route) {
-            ProfilePage()
+            ReportScreen(medicineViewModel, userEmail)
         }
         composable(BottomNavItem.Settings.route) {
-            SettingsPage(mainNavController, authViewModel)
+            SettingsScreen(mainNavController, authViewModel)
         }
         composable("add_medicine/{userEmail}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("userEmail") ?: userEmail
-            AddMedicinePage(
+            AddMedicineScreen(
                 navController = navController,
                 medicineViewModel = medicineViewModel,
                 userEmail = email
