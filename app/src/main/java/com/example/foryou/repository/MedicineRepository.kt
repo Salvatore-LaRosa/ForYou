@@ -40,16 +40,6 @@ class MedicineRepository(private val dao: MedicineDao) {
         dao.getAllMedicinesForUser(email)
 
     /**
-     * Retrieves all active medicines for a user up to a specific date.
-     *
-     * @param email The user's email.
-     * @param today The date to filter by (in "yyyy-MM-dd" format).
-     * @return A [Flow] emitting a list of active [Medicine] objects.
-     */
-    fun getMedicinesForUserAndDate(email: String, today: String): Flow<List<Medicine>> =
-        dao.getMedicinesForUserAndDate(email, today)
-
-    /**
      * Deletes a medicine record for a user if its end date is on or after the specified date.
      * Note: This performs a hard delete of the entire medicine record, which might not be the
      * desired behavior. A safer approach would be to update the medicine's end date to effectively
