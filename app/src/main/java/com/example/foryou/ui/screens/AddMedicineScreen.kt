@@ -193,7 +193,7 @@ private fun FrequencyDropdown(frequency: String, onFrequencyChange: (String) -> 
             readOnly = true,
             label = { Text("Frequency") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth()
+            modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             frequencyOptions.forEach { option ->
