@@ -12,7 +12,6 @@ import com.example.foryou.R
 
 /**
  * A [BroadcastReceiver] that handles scheduled medicine reminders.
- * It receives an intent from the [AlarmManager], builds, and displays a notification.
  */
 class ReminderReceiver : BroadcastReceiver() {
 
