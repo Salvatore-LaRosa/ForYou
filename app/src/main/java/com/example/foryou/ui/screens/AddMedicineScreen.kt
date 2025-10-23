@@ -178,7 +178,8 @@ fun AddMedicineScreen(
                             endDate = dataFine.toString(),
                             notes = note.ifBlank { null },
                             userEmail = userEmail,
-                            creationDate = LocalDate.now().toString()
+                            creationDate = LocalDate.now().toString(),
+                            time = orario.toString()
                         )
                         medicineViewModel.insertMedicine(medicine)
                         scheduleMedicineReminder(context, nome, orario!!, frequenza)

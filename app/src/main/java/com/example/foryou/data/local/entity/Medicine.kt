@@ -22,6 +22,7 @@ data class Medicine(
     val frequency: String,
     val quantity: String,
     val endDate: String,
+    val time: String,
     val notes: String?,
     val userEmail: String,
     val creationDate: String
