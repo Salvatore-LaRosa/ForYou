@@ -12,12 +12,16 @@ roomRuntimeAndroid = "2.8.2"
 navigationRuntimeAndroid = "2.9.5"
 navigationComposeAndroid = "2.9.5"
 appcompat = "1.7.1"
+core-splashscreen = "1.0.1"
 
 [libraries]
 # --- Core & Lifecycle ---
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+
+# --- Spashscreen ---
+core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "core-splashscreen" }
 
 # --- Compose ---
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
