@@ -1,65 +1,171 @@
 package com.example.foryou.ui.screens
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.foryou.R
 import com.example.foryou.viewmodel.AuthViewModel
 
 /**
- * Login screen for the user.
- * Allows the user to enter their email and password to log in.
+ * A composable function that represents the login screen of the application.
+ * It allows users to enter their credentials and log in.
  *
- * @param navController The NavController for navigation.
- * @param viewModel The ViewModel for authentication.
+ * @param navController The NavController for handling navigation.
+ * @param viewModel The AuthViewModel for handling authentication logic.
  */
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
+    // Collecting state from the ViewModel for email, password, and authentication result.
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val authResult by viewModel.authResult.collectAsState()
 
-    Column(
+    // Main container with a background color.
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+            .background(Color(0xFFE7EAF0))
     ) {
-        Text("Login", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(80.dp))
 
-        EmailTextField(email = email, onEmailChange = { viewModel.onEmailChange(it) })
+            // Top illustration image.
+            Image(
+                painter = painterResource(id = R.drawable.wallpaper),
+                contentDescription = null, // Decorative image
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        PasswordTextField(password = password, onPasswordChange = { viewModel.onPasswordChange(it) })
+            // Screen title and subtitle.
+            Text(
+                text = "Bentornato",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF05A9B2)
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        LoginButton(onClick = { viewModel.login() })
+            Text(
+                text = "Inserisci tue credenziali",
+                fontSize = 16.sp,
+                color = Color(0xFF62C9CE)
+            )
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        RegisterButton(onClick = { navController.navigate("register") })
+            // Email input field.
+            OutlinedTextField(
+                value = email,
+                onValueChange = { viewModel.onEmailChange(it) },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user),
+                        contentDescription = "Email Icon",
+                        tint = Color(0xFF05A9B2)
+                    )
+                },
+                placeholder = { Text("Email") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            )
 
-        authResult?.let {
-            AuthResultMessage(message = it) {
-                LaunchedEffect(Unit) {
-                    val pinSet = viewModel.isPinSet(email)
-                    if (pinSet) {
-                        navController.navigate("mainPage/${email}") {
-                            popUpTo("login") { inclusive = true }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Password input field.
+            OutlinedTextField(
+                value = password,
+                onValueChange = { viewModel.onPasswordChange(it) },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_lock),
+                        contentDescription = "Password Icon",
+                        tint = Color(0xFF05A9B2)
+                    )
+                },
+                placeholder = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Login button.
+            Button(
+                onClick = { viewModel.login() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF05A9B2)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Accedi", color = Color.White, fontSize = 16.sp)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Button to navigate to the registration screen.
+            OutlinedButton(
+                onClick = { navController.navigate("register") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF62C9CE)),
+                border = BorderStroke(
+                    width = 1.dp, brush = SolidColor(Color(0xFF62C9CE))
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Crea un nuovo account", color = Color(0xFF62C9CE), fontSize = 16.sp)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Displays the authentication result message and handles navigation on success.
+            authResult?.let {
+                AuthResultMessage(message = it) {
+                    // LaunchedEffect to handle navigation after a successful login.
+                    LaunchedEffect(Unit) {
+                        val pinSet = viewModel.isPinSet(email)
+                        // Navigate to the main page if PIN is set, otherwise to PIN setup.
+                        if (pinSet) {
+                            navController.navigate("mainPage/${email}") {
+                                popUpTo("login") { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate("setup_pin") {
+                                popUpTo("login") { inclusive = true }
+                            }
                         }
-                    } else {
-                        navController.navigate("setup_pin") {
-                            popUpTo("login") { inclusive = true }
-                        }
+                        viewModel.clearMessage() // Clear the message after handling.
                     }
-                    viewModel.clearMessage()
                 }
             }
         }
@@ -67,78 +173,17 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
 }
 
 /**
- * A text field for entering an email address.
+ * A private composable to display the authentication result message.
+ * It triggers a callback on login success.
  *
- * @param email The current email value.
- * @param onEmailChange The callback to invoke when the email value changes.
- */
-@Composable
-private fun EmailTextField(email: String, onEmailChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = email,
-        onValueChange = onEmailChange,
-        label = { Text("Email") },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-/**
- * A text field for entering a password.
- *
- * @param password The current password value.
- * @param onPasswordChange The callback to invoke when the password value changes.
- */
-@Composable
-private fun PasswordTextField(password: String, onPasswordChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = password,
-        onValueChange = onPasswordChange,
-        label = { Text("Password") },
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-/**
- * A button to trigger the login action.
- *
- * @param onClick The callback to invoke when the button is clicked.
- */
-@Composable
-private fun LoginButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text("Login")
-    }
-}
-
-/**
- * A button to navigate to the registration screen.
- *
- * @param onClick The callback to invoke when the button is clicked.
- */
-@Composable
-private fun ColumnScope.RegisterButton(onClick: () -> Unit) {
-    TextButton(
-        onClick = onClick,
-        modifier = Modifier.align(Alignment.CenterHorizontally)
-    ) {
-        Text("Don't have an account? Register")
-    }
-}
-
-/**
- * Displays the authentication result message.
- *
- * @param message The message to display.
- * @param onLoginSuccess The callback to invoke when the login is successful.
+ * @param message The authentication message to display.
+ * @param onLoginSuccess A composable lambda to be executed on successful login.
  */
 @Composable
 private fun AuthResultMessage(message: String, onLoginSuccess: @Composable () -> Unit) {
     Spacer(Modifier.height(8.dp))
-    Text(message)
+    Text(message, color = Color(0xFF05A9B2))
+    // If the message indicates success, invoke the success callback.
     if (message == "Login success") {
         onLoginSuccess()
     }

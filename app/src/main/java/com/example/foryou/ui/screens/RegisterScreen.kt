@@ -1,59 +1,162 @@
 package com.example.foryou.ui.screens
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.foryou.R
 import com.example.foryou.viewmodel.AuthViewModel
 
 /**
- * Registration screen for a new user.
- * Allows the user to enter an email and password to create a new account.
+ * A composable function that represents the registration screen of the application.
+ * It allows new users to create an account by providing an email and password.
  *
- * @param navController The NavController for navigation.
- * @param viewModel The ViewModel for authentication.
+ * @param navController The NavController for handling navigation.
+ * @param viewModel The AuthViewModel for handling registration logic.
  */
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
+    // Collecting state from the ViewModel for email, password, and authentication result.
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val authResult by viewModel.authResult.collectAsState()
 
-    Column(
+    // Main container with a background color.
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+            .background(Color(0xFFE7EAF0))
     ) {
-        Text("Registration", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(80.dp))
 
-        EmailTextField(email = email, onEmailChange = { viewModel.onEmailChange(it) })
+            // Top illustration image.
+            Image(
+                painter = painterResource(id = R.drawable.wallpaper),
+                contentDescription = null, // Decorative image
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+            )
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        PasswordTextField(password = password, onPasswordChange = { viewModel.onPasswordChange(it) })
+            // Screen title and subtitle.
+            Text(
+                text = "Crea il tuo account",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF05A9B2)
+            )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        RegisterActionButton(onClick = { viewModel.register() })
+            Text(
+                text = "Inserisci email e password per registrarti",
+                fontSize = 16.sp,
+                color = Color(0xFF62C9CE)
+            )
 
-        Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        LoginNavigationButton(onClick = { navController.navigate("login") })
+            // Email input field.
+            OutlinedTextField(
+                value = email,
+                onValueChange = { viewModel.onEmailChange(it) },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user),
+                        contentDescription = "Email Icon",
+                        tint = Color(0xFF05A9B2)
+                    )
+                },
+                placeholder = { Text("Email") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            )
 
-        authResult?.let {
-            RegistrationResultMessage(message = it) {
-                LaunchedEffect(Unit) {
-                    viewModel.saveUserSession(email) // Immediately save the user session
-                    navController.navigate("setup_pin") {
-                        popUpTo("register") { inclusive = true }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Password input field.
+            OutlinedTextField(
+                value = password,
+                onValueChange = { viewModel.onPasswordChange(it) },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_lock),
+                        contentDescription = "Password Icon",
+                        tint = Color(0xFF05A9B2)
+                    )
+                },
+                placeholder = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Register button.
+            Button(
+                onClick = { viewModel.register() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF05A9B2)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Registrati", color = Color.White, fontSize = 16.sp)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Button to navigate back to the Login screen.
+            OutlinedButton(
+                onClick = { navController.navigate("login") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF62C9CE)),
+                border = BorderStroke(1.dp, Color(0xFF62C9CE)),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Hai già un account? Accedi", color = Color(0xFF62C9CE), fontSize = 16.sp)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Displays the registration result message and handles navigation on success.
+            authResult?.let {
+                RegistrationResultMessage(message = it) {
+                    // LaunchedEffect to handle navigation after a successful registration.
+                    LaunchedEffect(Unit) {
+                        viewModel.saveUserSession(email)
+                        // Navigate to the PIN setup screen after registration.
+                        navController.navigate("setup_pin") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                        viewModel.clearMessage() // Clear the message after handling.
                     }
-                    viewModel.clearMessage()
                 }
             }
         }
@@ -61,78 +164,17 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
 }
 
 /**
- * A text field for entering an email address.
+ * A private composable to display the registration result message.
+ * It triggers a callback on registration success.
  *
- * @param email The current email value.
- * @param onEmailChange The callback to invoke when the email value changes.
- */
-@Composable
-private fun EmailTextField(email: String, onEmailChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = email,
-        onValueChange = onEmailChange,
-        label = { Text("Email") },
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-/**
- * A text field for entering a password.
- *
- * @param password The current password value.
- * @param onPasswordChange The callback to invoke when the password value changes.
- */
-@Composable
-private fun PasswordTextField(password: String, onPasswordChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = password,
-        onValueChange = onPasswordChange,
-        label = { Text("Password") },
-        visualTransformation = PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-/**
- * A button to trigger the registration action.
- *
- * @param onClick The callback to invoke when the button is clicked.
- */
-@Composable
-private fun RegisterActionButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text("Register")
-    }
-}
-
-/**
- * A text button to navigate to the login screen.
- *
- * @param onClick The callback to invoke when the button is clicked.
- */
-@Composable
-private fun ColumnScope.LoginNavigationButton(onClick: () -> Unit) {
-    TextButton(
-        onClick = onClick,
-        modifier = Modifier.align(Alignment.CenterHorizontally)
-    ) {
-        Text("Already have an account? Login")
-    }
-}
-
-/**
- * Displays the registration result message and handles navigation on success.
- *
- * @param message The message to display.
- * @param onRegistrationSuccess The composable to execute upon successful registration.
+ * @param message The registration message to display.
+ * @param onRegistrationSuccess A composable lambda to be executed on successful registration.
  */
 @Composable
 private fun RegistrationResultMessage(message: String, onRegistrationSuccess: @Composable () -> Unit) {
     Spacer(Modifier.height(8.dp))
-    Text(message)
+    Text(message, color = Color(0xFF05A9B2))
+    // If the message indicates success, invoke the success callback.
     if (message == "Registration success") {
         onRegistrationSuccess()
     }

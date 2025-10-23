@@ -4,51 +4,36 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.foryou.data.local.entity.Medicine
+import com.example.foryou.ui.theme.*
 import com.example.foryou.viewmodel.MedicineViewModel
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.rememberDatePickerState
-import java.time.Instant
-import java.time.ZoneId
-import com.example.foryou.data.local.entity.Medicine
 
-/**
- * Utility function to parse a string into a LocalDate object.
- * Tries to parse the string with different date formats.
- *
- * @param dateStr The date string to parse.
- * @return A LocalDate object if parsing is successful, otherwise null.
- */
 private fun parseDate(dateStr: String): LocalDate? {
     val formats = listOf(
         DateTimeFormatter.ISO_LOCAL_DATE,
         DateTimeFormatter.ofPattern("yyyy/MM/dd")
     )
-
     for (format in formats) {
         try {
             return LocalDate.parse(dateStr, format)
-        } catch (_: DateTimeParseException) {
-        }
+        } catch (_: DateTimeParseException) { }
     }
     return null
 }
 
-/**
- * Main screen of the application.
- * Displays the list of medicines for the selected date and allows the user to add new ones.
- *
- * @param navController The NavController for navigation.
- * @param medicineViewModel The ViewModel for accessing medicine data.
- * @param userEmail The current user's email.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -67,37 +52,55 @@ fun HomeScreen(
     val filteredMedicines = medicines.filter { med ->
         val start = parseDate(med.creationDate)
         val end = parseDate(med.endDate)
-        if (start != null && end != null) {
-            selectedDate in start..end
-        } else false
+        if (start != null && end != null) selectedDate in start..end else false
     }
 
     Scaffold(
-        topBar = {
-            HomeScreenTopAppBar(
-                selectedDate = selectedDate,
-                dateFormatter = dateFormatter,
-                onDateClick = { showDatePicker = true }
-            )
-        },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate("add_medicine/$userEmail") }
+                onClick = { navController.navigate("add_medicine/$userEmail") },
+                containerColor = MainColor,
+                shape = CircleShape
             ) {
-                Text("+")
+                Text("+", color = White, style = MaterialTheme.typography.titleLarge)
             }
-        }
+        },
+        containerColor = BackgroundColor
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .padding(horizontal = 20.dp)
         ) {
-            val dateText = if (selectedDate == LocalDate.now()) "Today" else selectedDate.format(dateFormatter)
+            Spacer(modifier = Modifier.height(40.dp))
             Text(
-                text = "Medicines for $dateText",
-                style = MaterialTheme.typography.headlineSmall
+                text = "Home",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MainColor
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = selectedDate.format(dateFormatter),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Seleziona data") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showDatePicker = true },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MainColor,
+                    unfocusedBorderColor = SecondaryColor
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            val dateText = if (selectedDate == LocalDate.now()) "Oggi" else selectedDate.format(dateFormatter)
+            Text(
+                text = "Medicinali per $dateText",
+                style = MaterialTheme.typography.titleLarge,
+                color = MainColor
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -127,67 +130,18 @@ fun HomeScreen(
             onDismissRequest = { selectedMedicine = null },
             onMarkAsTaken = {
                 val today = selectedDate.toString()
-                medicineViewModel.markAsTaken(
-                    selectedMedicine!!.name,
-                    userEmail,
-                    today
-                )
+                medicineViewModel.markAsTaken(selectedMedicine!!.name, userEmail, today)
                 selectedMedicine = null
             },
             onDeleteFromDate = {
                 val today = selectedDate.toString()
-                medicineViewModel.deleteFromDate(
-                    selectedMedicine!!.name,
-                    userEmail,
-                    today
-                )
+                medicineViewModel.deleteFromDate(selectedMedicine!!.name, userEmail, today)
                 selectedMedicine = null
             }
         )
     }
 }
 
-/**
- * The top app bar for the main screen.
- * Displays the title and a text field for date selection.
- *
- * @param selectedDate The currently selected date.
- * @param dateFormatter The formatter for displaying the date.
- * @param onDateClick The callback to invoke when the date field is clicked.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeScreenTopAppBar(
-    selectedDate: LocalDate,
-    dateFormatter: DateTimeFormatter,
-    onDateClick: () -> Unit
-) {
-    TopAppBar(
-        title = { Text("Medicines") },
-        actions = {
-            OutlinedTextField(
-                value = selectedDate.format(dateFormatter),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Select date") },
-                modifier = Modifier
-                    .width(150.dp)
-                    .clickable(onClick = onDateClick)
-            )
-        }
-    )
-}
-
-/**
- * Displays a list of medicines.
- * If the list is empty, a message is displayed.
- *
- * @param medicines The list of medicines to display.
- * @param medicineViewModel The ViewModel for accessing medicine data.
- * @param userEmail The current user's email.
- * @param selectedDate The currently selected date.
- * @param onMedicineClick The callback to invoke when a medicine is clicked.
- */
 @Composable
 private fun MedicineList(
     medicines: List<Medicine>,
@@ -197,9 +151,14 @@ private fun MedicineList(
     onMedicineClick: (Medicine) -> Unit
 ) {
     if (medicines.isEmpty()) {
-        Text("No medicines scheduled for this date.")
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Nessun medicinale per questa data", color = TextGray)
+        }
     } else {
-        LazyColumn {
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(medicines) { med ->
                 val intakes by medicineViewModel
                     .getIntakesForMedicine(userEmail, med.name)
@@ -218,46 +177,33 @@ private fun MedicineList(
     }
 }
 
-/**
- * Displays a single medicine card.
- *
- * @param medicine The medicine to display.
- * @param isTaken Indicates whether the medicine has been taken today.
- * @param onClick The callback to invoke when the card is clicked.
- */
 @Composable
 private fun MedicineCard(
     medicine: Medicine,
     isTaken: Boolean,
     onClick: () -> Unit
 ) {
+    val cardColor = if (isTaken) Confirmed else White
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isTaken)
-                MaterialTheme.colorScheme.tertiaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceVariant
-        )
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                medicine.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = if (isTaken)
-                    MaterialTheme.colorScheme.onTertiaryContainer
-                else
-                    MaterialTheme.colorScheme.onSurface
+                text = medicine.name,
+                style = MaterialTheme.typography.titleMedium.copy(color = MainColor)
             )
-            Text("Quantity: ${medicine.quantity}")
-            Text("Notes: ${medicine.notes ?: "—"}")
+            Text("Quantità: ${medicine.quantity}", color = SecondaryColor)
+            Text("Note: ${medicine.notes ?: "—"}", color = TextGray)
             if (isTaken) {
                 Text(
-                    "Taken today",
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    "Assunto oggi",
+                    color = MainColor,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -265,12 +211,6 @@ private fun MedicineCard(
     }
 }
 
-/**
- * Dialog for selecting a date.
- *
- * @param onDismissRequest The callback to invoke when the dialog is dismissed.
- * @param onDateSelected The callback to invoke when a date is selected.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DatePickerDialog(
@@ -289,26 +229,18 @@ private fun DatePickerDialog(
                     onDateSelected(selectedDate)
                 }
             }) {
-                Text("Confirm")
+                Text("Conferma", color = MainColor)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismissRequest) {
-                Text("Cancel")
+                Text("Annulla", color = SecondaryColor)
             }
         },
         text = { DatePicker(state = datePickerState) }
     )
 }
 
-/**
- * Dialog for displaying medicine details and performing actions.
- *
- * @param medicine The medicine to display.
- * @param onDismissRequest The callback to invoke when the dialog is dismissed.
- * @param onMarkAsTaken The callback to invoke when the medicine is marked as taken.
- * @param onDeleteFromDate The callback to invoke when the medicine is deleted from today onwards.
- */
 @Composable
 private fun MedicineDetailDialog(
     medicine: Medicine,
@@ -318,18 +250,19 @@ private fun MedicineDetailDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(medicine.name) },
+        title = {
+            Text(
+                medicine.name,
+                color = MainColor,
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         text = {
             Column {
-                Text("Quantity: ${medicine.quantity}")
-                Text("Frequency: ${medicine.frequency}")
-                Text("End date: ${medicine.endDate}")
-                Text("Notes: ${medicine.notes ?: "None"}")
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    "Select an action:",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Text("Quantità: ${medicine.quantity}")
+                Text("Frequenza: ${medicine.frequency}")
+                Text("Fine: ${medicine.endDate}")
+                Text("Note: ${medicine.notes ?: "—"}")
             }
         },
         confirmButton = {
@@ -339,29 +272,24 @@ private fun MedicineDetailDialog(
             ) {
                 Button(
                     onClick = onMarkAsTaken,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MainColor)
                 ) {
-                    Text("Taken / Completed")
+                    Text("Assunto / Completato", color = White)
                 }
 
                 Button(
                     onClick = onDeleteFromDate,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+                    colors = ButtonDefaults.buttonColors(containerColor = SecondaryColor)
                 ) {
-                    Text("Delete from today onwards")
+                    Text("Elimina da oggi", color = White)
                 }
 
-                TextButton(
-                    onClick = onDismissRequest,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Close")
+                TextButton(onClick = onDismissRequest, modifier = Modifier.fillMaxWidth()) {
+                    Text("Chiudi", color = TextGray)
                 }
             }
-        },
-        dismissButton = {}
+        }
     )
 }
