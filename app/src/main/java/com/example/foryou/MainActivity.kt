@@ -9,12 +9,17 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.foryou.data.session.SessionManager
 import com.example.foryou.data.local.UserDatabase
+import com.example.foryou.data.session.SessionManager
 import com.example.foryou.navigation.NavGraph
 import com.example.foryou.repository.MedicineRepository
 import com.example.foryou.repository.UserRepository
@@ -36,6 +41,8 @@ class MainActivity : AppCompatActivity() {
     private val promptManager by lazy { BiometricPromptManager(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Show personalized splashScreen
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         // Enables edge-to-edge display for a more immersive UI.
         enableEdgeToEdge()
@@ -62,18 +69,22 @@ class MainActivity : AppCompatActivity() {
         // Set the main content of the activity to be our Composable UI.
         setContent {
             ForYouTheme {
-                // Obtain ViewModels using their respective factories.
-                val authViewModel: AuthViewModel = viewModel(factory = authFactory)
-                val medicineViewModel: MedicineViewModel = viewModel(factory = medicineFactory)
-                val navController = rememberNavController()
+                Box(
+                    modifier = androidx.compose.ui.Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(WindowInsets(0))
+                ) {
+                    val authViewModel: AuthViewModel = viewModel(factory = authFactory)
+                    val medicineViewModel: MedicineViewModel = viewModel(factory = medicineFactory)
+                    val navController = rememberNavController()
 
-                // Set up the navigation graph, passing all necessary dependencies.
-                NavGraph(
-                    navController = navController,
-                    viewModel = authViewModel,
-                    medicineViewModel = medicineViewModel,
-                    promptManager = promptManager
-                )
+                    NavGraph(
+                        navController = navController,
+                        viewModel = authViewModel,
+                        medicineViewModel = medicineViewModel,
+                        promptManager = promptManager
+                    )
+                }
             }
         }
     }

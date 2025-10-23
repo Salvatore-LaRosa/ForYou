@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.ForYou" parent="Theme.AppCompat.NoActionBar" />
+    <!-- Tema principale senza ActionBar -->
+    <style name="Theme.ForYou" parent="Theme.AppCompat.NoActionBar">
+        <!-- Colori principali -->
+        <item name="colorPrimary">@color/main_color</item>
+        <item name="colorPrimaryDark">@color/main_color</item>
+        <item name="colorAccent">@color/secondary_color</item>
+
+        <!-- Sfondo e testo -->
+        <item name="android:windowBackground">@color/background_color</item>
+        <item name="android:textColor">@color/text_gray</item>
+
+        <!-- Status bar e navigation bar -->
+        <item name="android:statusBarColor">@color/main_color</item>
+        <item name="android:navigationBarColor">@color/main_color</item>
+    </style>
+
+    <!-- Tema Splash compatibile con AppCompat -->
+    <style name="Theme.ForYou.Splash" parent="Theme.AppCompat.NoActionBar">
+        <!-- Colore di sfondo -->
+        <item name="android:windowBackground">@color/main_color</item>
+        <!-- Icona centrale -->
+        <item name="android:windowSplashScreenAnimatedIcon" tools:targetApi="31">@drawable/ic_launcher_foreground</item>
+        <!-- Dopo lo splash -->
+        <item name="postSplashScreenTheme">@style/Theme.ForYou</item>
+    </style>
+
 </resources>

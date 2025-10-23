@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
+    <!-- Background a colore pieno -->
+    <background android:drawable="@color/ic_launcher_background_color" />
+
+    <!-- Foreground con padding per non essere croppato -->
     <foreground android:drawable="@drawable/ic_launcher_foreground" />
+
+    <!-- Monochrome -->
     <monochrome android:drawable="@drawable/ic_launcher_foreground" />
 </adaptive-icon>
