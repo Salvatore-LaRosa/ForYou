@@ -1,8 +1,6 @@
 package com.example.foryou.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -13,10 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.foryou.ui.theme.*
 import com.example.foryou.viewmodel.MedicineViewModel
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import com.example.foryou.data.local.entity.MedicineIntake
 
 /**
  * A screen that displays a monthly report of medicine intake.
@@ -50,30 +50,37 @@ fun ReportScreen(
     val today = LocalDate.now()
 
     Scaffold(
+        containerColor = BackgroundColor,
         topBar = {
-            // Top app bar displaying the title with the current month and year.
-            TopAppBar(
-                title = { Text("Resoconto ${selectedMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${selectedMonth.year}") },
-                actions = {
-                    // Actions in the TopAppBar to navigate to the previous or next month.
-                    Row {
-                        IconButton(onClick = { selectedMonth = selectedMonth.minusMonths(1) }) {
-                            Text("<")
-                        }
-                        IconButton(onClick = { selectedMonth = selectedMonth.plusMonths(1) }) {
-                            Text(">")
-                        }
-                    }
-                }
-            )
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .background(BackgroundColor)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Resoconto",
+                    color = MainColor,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = selectedMonth.month.name.lowercase()
+                        .replaceFirstChar { it.uppercase() } + " ${selectedMonth.year}",
+                    color = MainColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     ) { padding ->
         // Main content of the screen, scrollable vertically.
         Column(
-            modifier = Modifier
+            Modifier
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(8.dp)
+                .padding(horizontal = 16.dp)
         ) {
             // If there are no medicines, display a message to the user.
             if (medicines.isEmpty()) {
@@ -98,67 +105,106 @@ fun ReportScreen(
 
                 // Display the medicine card only if it is relevant for the displayed month.
                 if (isInMonth) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ReportCard(
+                        title = med.name,
+                        intakes = intakes,
+                        creationDate = creationDate,
+                        endDate = endDate,
+                        selectedMonth = selectedMonth,
+                        monthDays = monthDays,
+                        today = today
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Composable per la card di resoconto singola.
+ */
+@Composable
+fun ReportCard(
+    title: String,
+    intakes: List<MedicineIntake>,
+    creationDate: LocalDate,
+    endDate: LocalDate,
+    selectedMonth: YearMonth,
+    monthDays: List<LocalDate>,
+    today: LocalDate
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        shape = MaterialTheme.shapes.large
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(title, fontWeight = FontWeight.Bold, color = MainColor)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Griglia calendario
+            Column(
+                modifier = Modifier
+                    .background(Color.White, shape = MaterialTheme.shapes.large)
+                    .padding(8.dp)
+            ) {
+                val daysOfWeek = listOf("Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom")
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    daysOfWeek.forEach {
+                        Text(it, fontWeight = FontWeight.Bold)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                val firstDayOfWeek = monthDays.first().dayOfWeek.value
+                var currentIndex = 1
+                val totalDays = monthDays.size
+
+                while (currentIndex <= totalDays) {
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Column(Modifier.padding(8.dp)) {
-                            // Display the medicine name.
-                            Text(
-                                med.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                        for (i in 1..7) {
+                            if ((currentIndex == 1 && i < firstDayOfWeek) || currentIndex > totalDays) {
+                                Box(modifier = Modifier.size(36.dp))
+                            } else {
+                                val day = monthDays[currentIndex - 1]
+                                val isBeforeEnd = !day.isAfter(endDate)
+                                val isAfterStart = !day.isBefore(creationDate)
+                                val intakeForDay = intakes.find { it.date == day.toString() }
 
-                            // A horizontally scrollable row representing the month's calendar.
-                            Row(
-                                Modifier
-                                    .horizontalScroll(rememberScrollState())
-                                    .padding(bottom = 4.dp)
-                            ) {
-                                // Iterate over each day of the month to display the intake status.
-                                monthDays.forEach { day ->
-                                    // Check if the current day is within the medicine's intake period.
-                                    val isBeforeEnd = !day.isAfter(endDate)
-                                    val isAfterStart = !day.isBefore(creationDate)
-
-                                    // Find the recorded intake for this specific day.
-                                    val intakeForDay = intakes.find { it.date == day.toString() }
-
-                                    // Determine the background color for the day's box based on intake status.
-                                    val color = when {
-                                        // If the day is outside the intake range, it's transparent.
-                                        !isBeforeEnd || !isAfterStart -> Color.Transparent
-                                        // If the day is in the future, it's light gray.
-                                        day.isAfter(today) -> Color.LightGray
-                                        // If the intake was marked as "taken", it's green.
-                                        intakeForDay?.taken == true -> Color(0xFF81C784)
-                                        // If the intake was missed or not yet recorded (for past days), it's red.
-                                        intakeForDay?.taken == false -> Color(0xFFE57373)
-                                        // Default to red for past days without intake records.
-                                        else -> Color(0xFFE57373)
-                                    }
-
-                                    // Box representing a single day in the calendar.
-                                    Box(
-                                        modifier = Modifier
-                                            .size(32.dp)
-                                            .padding(2.dp)
-                                            .background(color, shape = MaterialTheme.shapes.small)
-                                            .border(1.dp, Color.Gray)
-                                            .align(Alignment.CenterVertically),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        // Display the day number.
-                                        Text(day.dayOfMonth.toString())
-                                    }
+                                val color = when {
+                                    !isBeforeEnd || !isAfterStart -> Color.Transparent
+                                    day.isAfter(today) -> Color.LightGray
+                                    intakeForDay?.taken == true -> Color(0xFF8AFF8A)
+                                    intakeForDay?.taken == false -> Color(0xFFFF6B6B)
+                                    else -> Color(0xFFFF6B6B)
                                 }
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(color, shape = MaterialTheme.shapes.medium),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(day.dayOfMonth.toString())
+                                }
+                                currentIndex++
                             }
                         }
                     }
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
             }
         }
