@@ -110,7 +110,6 @@ fun ReportScreen(
                         intakes = intakes,
                         creationDate = creationDate,
                         endDate = endDate,
-                        selectedMonth = selectedMonth,
                         monthDays = monthDays,
                         today = today
                     )
@@ -129,7 +128,6 @@ fun ReportCard(
     intakes: List<MedicineIntake>,
     creationDate: LocalDate,
     endDate: LocalDate,
-    selectedMonth: YearMonth,
     monthDays: List<LocalDate>,
     today: LocalDate
 ) {
