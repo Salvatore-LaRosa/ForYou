@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -36,7 +39,7 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
@@ -46,6 +49,13 @@ android {
 
     composeCompiler {
         enableStrongSkippingMode.set(true)
+    }
+
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+            isIncludeAndroidResources = true
+        }
     }
 }
 
@@ -58,7 +68,6 @@ dependencies {
 
     // --- SplashScreen ---
     implementation(libs.core.splashscreen)
-
 
     // --- Compose ---
     implementation(platform(libs.androidx.compose.bom))
@@ -79,6 +88,9 @@ dependencies {
 
     // --- Test ---
     testImplementation(libs.junit)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.androidx.core.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -88,5 +100,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("androidx.biometric:biometric:1.1.0")
+    implementation(libs.androidx.biometric)
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnit()
 }

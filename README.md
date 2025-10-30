@@ -38,6 +38,24 @@ L'applicazione segue i moderni principi di sviluppo Android, adottando un'archit
 - **Navigazione**: Jetpack Navigation for Compose
 - **Autenticazione**: Android Biometric Library
 
+## 🧪 Testing
+
+Il progetto include test unitari e di strumentazione per garantire la correttezza e l'affidabilità del codice.
+
+### Test Unitari
+
+I test unitari si trovano in `app/src/test/java/` e verificano le singole unità di codice, come i ViewModel, in isolamento.
+
+- **`MedicineViewModelTest`**: Questo test verifica la logica del `MedicineViewModel` e la sua interazione con il `MedicineRepository`. Utilizza `mockito-kotlin` per mockare il repository e `kotlinx-coroutines-test` per gestire le coroutine, garantendo che le operazioni asincrone vengano eseguite e verificate correttamente.
+
+### Test di Strumentazione
+
+I test di strumentazione si trovano in `app/src/androidTest/java/` e vengono eseguiti su un dispositivo o emulatore Android. Verificano le parti dell'app che dipendono dal framework Android.
+
+- **`MedicineDaoTest`**: Questo test verifica le operazioni di accesso al database (DAO) per l'entità `Medicine`. Utilizza un database Room in memoria per eseguire test di inserimento e lettura, garantendo che le query SQL e le entità funzionino come previsto.
+
+- **`ExampleInstrumentedTest`**: Un test di base che verifica che il contesto dell'applicazione sia corretto e che l'app venga caricata senza errori.
+
 ## 🚀 Come Iniziare
 
 1.  **Clona il repository**:

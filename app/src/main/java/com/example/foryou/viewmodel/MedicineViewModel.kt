@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.foryou.data.local.entity.Medicine
 import com.example.foryou.data.local.entity.MedicineIntake
 import com.example.foryou.repository.MedicineRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -13,8 +15,12 @@ import kotlinx.coroutines.launch
  * It interacts with the [MedicineRepository] to perform CRUD operations.
  *
  * @param repository The repository for accessing medicine and intake data.
+ * @param dispatcher The coroutine dispatcher to use for background tasks.
  */
-class MedicineViewModel(private val repository: MedicineRepository) : ViewModel() {
+class MedicineViewModel(
+    private val repository: MedicineRepository,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) : ViewModel() {
 
     /**
      * Inserts a new medicine into the database.
@@ -22,7 +28,7 @@ class MedicineViewModel(private val repository: MedicineRepository) : ViewModel(
      * @param medicine The [Medicine] object to insert.
      */
     fun insertMedicine(medicine: Medicine) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             repository.insertMedicine(medicine)
         }
     }
@@ -46,7 +52,7 @@ class MedicineViewModel(private val repository: MedicineRepository) : ViewModel(
      * @param fromDate The date from which to delete the medicine (inclusive).
      */
     fun deleteFromDate(medicineName: String, userEmail: String, fromDate: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             repository.deleteFromDate(medicineName, userEmail, fromDate)
         }
     }
@@ -60,7 +66,7 @@ class MedicineViewModel(private val repository: MedicineRepository) : ViewModel(
      * @param date The date the medicine was taken.
      */
     fun markAsTaken(medicineName: String, userEmail: String, date: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher) {
             val intake = MedicineIntake(
                 medicineName = medicineName,
                 userEmail = userEmail,

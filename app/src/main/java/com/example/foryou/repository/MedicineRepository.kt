@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
  *
  * @param dao The Data Access Object for medicines and intakes.
  */
-class MedicineRepository(private val dao: MedicineDao) {
+open class MedicineRepository(private val dao: MedicineDao) {
 
     /**
      * Inserts a new medicine into the database.
@@ -20,7 +20,7 @@ class MedicineRepository(private val dao: MedicineDao) {
      *
      * @param medicine The [Medicine] object to insert.
      */
-    suspend fun insertMedicine(medicine: Medicine) = dao.insertMedicine(medicine)
+    open suspend fun insertMedicine(medicine: Medicine) = dao.insertMedicine(medicine)
 
     /**
      * Inserts a new medicine intake record into the database.
@@ -28,7 +28,7 @@ class MedicineRepository(private val dao: MedicineDao) {
      *
      * @param intake The [MedicineIntake] object to insert.
      */
-    suspend fun insertIntake(intake: MedicineIntake) = dao.insertIntake(intake)
+    open suspend fun insertIntake(intake: MedicineIntake) = dao.insertIntake(intake)
 
     /**
      * Retrieves all medicines registered for a specific user, without any date filtering.
@@ -36,7 +36,7 @@ class MedicineRepository(private val dao: MedicineDao) {
      * @param email The user's email.
      * @return A [Flow] emitting a list of all [Medicine] objects for the user.
      */
-    fun getAllMedicinesForUser(email: String): Flow<List<Medicine>> =
+    open fun getAllMedicinesForUser(email: String): Flow<List<Medicine>> =
         dao.getAllMedicinesForUser(email)
 
     /**
@@ -49,7 +49,7 @@ class MedicineRepository(private val dao: MedicineDao) {
      * @param email The user's email.
      * @param fromDate The date from which the deletion condition is checked.
      */
-    suspend fun deleteFromDate(medicineName: String, email: String, fromDate: String) =
+    open suspend fun deleteFromDate(medicineName: String, email: String, fromDate: String) =
         dao.deleteMedicinesFromDate(medicineName, email, fromDate)
 
     /**
@@ -59,6 +59,6 @@ class MedicineRepository(private val dao: MedicineDao) {
      * @param medicineName The name of the medicine.
      * @return A [Flow] emitting a list of [MedicineIntake] objects.
      */
-    fun getIntakesForMedicine(email: String, medicineName: String): Flow<List<MedicineIntake>> =
+    open fun getIntakesForMedicine(email: String, medicineName: String): Flow<List<MedicineIntake>> =
         dao.getIntakesForMedicine(email, medicineName)
 }
